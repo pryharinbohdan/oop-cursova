@@ -26,22 +26,27 @@ class Linked2List {
     Linked2List& operator=(Linked2List&& other) noexcept;
 
     // Метод, для отримання посилання на значення елементу списку
-    T& at();
+    T& at(const int index);
+    T& operator[](const int index);
 
     ///////////////////
-
+/*
     void push_back(const T data);
     void pop_back();
     void push_front(const T data);
     void pop_front(const T data);
     void add_before(const int index);
     void add_after(const int index);
-    void pop(const int index);
+    void pop(const int index);*/
+
     size_t size();
     t_node& sentinel();
     //////////////////
 
-
+    struct iterator {
+        T* data;
+      //....
+    };
     // Вкладений клас (ітератори)
 
     //
