@@ -25,38 +25,66 @@ class Linked2List {
     // Оператор переміщення
     Linked2List& operator=(Linked2List&& other) noexcept;
 
-    // Метод, для отримання посилання на значення елементу списку
-    T& at(const int index);
-    T& operator[](const int index);
-
     ///////////////////
-/*
     void push_back(const T data);
     void pop_back();
     void push_front(const T data);
     void pop_front(const T data);
-    void add_before(const int index);
-    void add_after(const int index);
-    void pop(const int index);*/
+    void insert_before(t_node<T>* node, const &T data);
+    void insert_after(t_node<T>* node, const &T data);
+    void clear() const;
+    bool empty() const;
+
+    class iterator {
+        t_node* ptr;
+      public:
+        iterator() : ptr(nullptr) {}
+        iterator(t_node* ptr) : ptr(ptr) {}
+
+        iterator operator ++ () {
+            return iterator(ptr = ptr -> next);
+        }
+        iterator operator -- () {
+            return iterator(ptr = ptr -> prev);
+        }
+        bool operator != (const iterator& guest) {
+            return ptr != guest.ptr;
+        }
+
+        T& operator * () {
+            return ptr -> data;
+        }
+    };
+
+    iterator& begin();
+    iterator& end();
 
     size_t size();
     t_node& sentinel();
     //////////////////
 
-    struct iterator {
-        T* data;
-      //....
-    };
+    
     // Вкладений клас (ітератори)
 
     //
 };
 
 int main() {
+    // створюємо об'єкт типу Linked2List
+
+    Linked2List < int > ls;
+
     /*
     
     ...
 
     */
+
+
+    //цикл ітератор
+    for (Linked2List < int > :: iterator it = ls.begin(); it != --ls.end(); ++it) {
+        cout << *it << " ";
+    }
+
     return 0;
 }
