@@ -30,8 +30,8 @@ class Linked2List {
     void pop_back();
     void push_front(const T data);
     void pop_front(const T data);
-    void insert_before(t_node<T>* node, const &T data);
-    void insert_after(t_node<T>* node, const &T data);
+    void insert_before(t_node<T>* node, const T& data);
+    void insert_after(t_node<T>* node, const T& data);
     void clear() const;
     bool empty() const;
 
@@ -60,14 +60,15 @@ class Linked2List {
     iterator& end();
 
     size_t size();
-    t_node& sentinel();
-    //////////////////
-
-    
-    // Вкладений клас (ітератори)
-
-    //
+    //t_node& sentinel();
 };
+
+
+/// РЕАЛІЗАЦІЯ МЕТОДІВ ///
+
+
+/////////////////////////////
+
 
 int main() {
     // створюємо об'єкт типу Linked2List
@@ -83,7 +84,7 @@ int main() {
 
     //цикл ітератор
     for (Linked2List < int > :: iterator it = ls.begin(); it != --ls.end(); ++it) {
-        cout << *it << " ";
+        std::cout << *it << " ";
     }
 
     return 0;
