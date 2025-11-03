@@ -1,0 +1,14 @@
+{
+    "files.associations": {
+        "xstring": "cpp",
+        "charconv": "cpp",
+        "xmemory": "cpp",
+        "initializer_list": "cpp",
+        "xutility": "cpp",
+        "bit": "cpp",
+        "exception": "cpp",
+        "format": "cpp",
+        "iterator": "cpp",
+        "type_traits": "cpp"
+    }
+}
