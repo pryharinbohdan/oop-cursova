@@ -81,7 +81,7 @@ class Linked2List {
     // Метод, що повертає кількість вузлів у списку
     size_t size();
     // Метод для пошуку вузла за значенням
-    iterator& search(const T value);
+    iterator search(const T value);
 
 
 };
@@ -272,6 +272,15 @@ size_t Linked2List<T>::size() {
     return list_size;
 }
 
+// Метод, що шукає вузол за значенням у списку
+template <typename T>
+typename Linked2List<T>::iterator Linked2List<T>::search(const T value) {
+    for (iterator it = begin(); it != end(); ++it) 
+        if (*it == value)
+            return it;
+    return iterator(nullptr);
+}
+
 /* *** ДЕСТРУКТОР СПИСКУ (Linked2List<T>) *** */
 
 template <typename T>
@@ -297,6 +306,8 @@ int main() {
             ls.erase(it);
         }
     }
+
+    ls.erase(ls.search(3));
 
     //цикл ітератор
     for (Linked2List < int > :: iterator it = ls.begin(); it != ls.end(); ++it) {
