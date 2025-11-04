@@ -211,6 +211,7 @@ void Linked2List<T>::pop_after(typename Linked2List<T>::iterator it) {
 }
 */
 
+// Метод, що видаляє обраний вузол списку
 template <typename T>
 void Linked2List<T>::erase(typename Linked2List<T>::iterator it) {
     t_node<T>* for_delete = it.ptr;
@@ -220,7 +221,6 @@ void Linked2List<T>::erase(typename Linked2List<T>::iterator it) {
     --list_size;
     delete for_delete;
 }
-
 // Метод для додавання нового вузла (ініціалізованого значенням) у кінець списку
 template <typename T>
 void Linked2List<T>::push_back(const T data) {
@@ -253,25 +253,21 @@ template <typename T>
 bool Linked2List<T>::empty() const {
     return begin() == end();
 }
-
 // Метод, що повертає посилання на ітератор першого вузла списку
 template <typename T>
 typename Linked2List<T>::iterator Linked2List<T>::begin() {
     return iterator(sen -> next);
 }
-
 // Метод, що повертає посилання на ітератор останнього вузла списку
 template <typename T>
 typename Linked2List<T>::iterator Linked2List<T>::end() {
     return iterator(sen);
 }
-
 // Метод, що повертає кількість вузлів у списку
 template <typename T>
 size_t Linked2List<T>::size() {
     return list_size;
 }
-
 // Метод, що шукає вузол за значенням у списку
 template <typename T>
 typename Linked2List<T>::iterator Linked2List<T>::search(const T value) {
