@@ -28,6 +28,8 @@ class Linked2List {
     Linked2List& operator=(const Linked2List& other);
     // Оператор переміщення
     Linked2List& operator=(Linked2List&& other) noexcept;
+    // Оператор для перевірки на рівність
+    bool operator==(Linked2List& other);
 
     ///////////////////
 
@@ -53,13 +55,6 @@ class Linked2List {
     void insert_after(iterator it, const T& data);
     // Метод для видалення вибраного вузла зі списку
     void erase(iterator it);
-
-    /*
-    // Метод для видалення вузла перед іншим вузлом у списку
-    void pop_before(iterator it);
-    // Метод для видалення вузла після іншого вузла у списку
-    void pop_after(iterator it);
-    */
 
     // Метод для додавання нового вузла (ініціалізованого значенням) у кінець списку
     void push_back(const T data);
@@ -169,6 +164,18 @@ Linked2List<T>& Linked2List<T>::operator=(Linked2List<T>&& other) noexcept {
     return *this;
 }
 
+// Оператор для перевірки на рівність
+template <typename T>
+bool Linked2List<T>::operator==(Linked2List& other) {
+    Linked2List<T>::iterator other_it = other.begin();
+    for (Linked2List<T>::iterator it = begin(); it != end(); ++it) {
+        if (*other_it != *it)
+            return false;
+        ++other_it;
+    }
+    return true;
+}
+
 /* *** МЕТОДИ СПИСКУ (Linked2List<T>) *** */
 
 // Метод для вставлення вузла перед іншим вузлом у списку
@@ -191,25 +198,6 @@ void Linked2List<T>::insert_after(typename Linked2List<T>::iterator it, const T&
     it.ptr -> next = new_node;
     ++list_size;
 }
-
-/*
-// Метод для видалення вузла перед іншим вузлом у списку
-template <typename T>
-void Linked2List<T>::pop_before(typename Linked2List<T>::iterator it) {
-    t_node<T>* for_delete = it.ptr -> prev;
-    for_delete -> prev -> next = it.ptr;
-    it.ptr -> prev = for_delete -> prev;
-    delete for_delete;
-}
-// Метод для видалення вузла після іншого вузла у списку
-template <typename T>
-void Linked2List<T>::pop_after(typename Linked2List<T>::iterator it) {
-    t_node<T>* for_delete = it.ptr -> next;
-    for_delete -> next -> prev = it.ptr;
-    it.ptr -> next = for_delete -> next;
-    delete for_delete;
-}
-*/
 
 // Метод, що видаляє обраний вузол списку
 template <typename T>
@@ -291,10 +279,18 @@ int main() {
     // створюємо об'єкт типу Linked2List
 
     Linked2List < int > ls;
+    Linked2List < int > ls_copy;
 
     
     for (int i = 0; i < 10; ++i) {
         ls.push_back(i);
+        ls_copy.push_back(i);
+    }
+
+    if (ls == ls_copy) {
+        std::cout << "Success" << std::endl;
+    } else {
+        std::cout << "Error" << std::endl;
     }
 
     for (Linked2List < int > :: iterator it = ls.begin(); it != ls.end(); ++it) {
