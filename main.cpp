@@ -24,12 +24,30 @@ class Linked2List {
     Linked2List(Linked2List&& other) noexcept;
     // Деструктор
     ~Linked2List();
-    // Оператор копіювання
+    /* Перевантаження оператору копіювання. Копіює кожен вузол правого списку 
+    та додає його в лівий список. Повертає посилання на лівий список */
     Linked2List& operator=(const Linked2List& other);
-    // Оператор переміщення
+    /* Перевантаження оператора переміщення. Передає ресурси з правого списку в лівий, 
+    обнуляючи дані правого списку. Повертає посилання на лівий список.*/
     Linked2List& operator=(Linked2List&& other) noexcept;
-    // Оператор для перевірки на рівність
+    /* Перевантаження оператора (==). Повертає true, якщо всі значення вузлів лівого списку
+    дорівнюють відповідним значенням вузлів правого списку. */
     bool operator==(Linked2List& other);
+    /* Перевантаження оператору (не дорівнює). Повертає true, в разі, якщо хоча б одне 
+    значення вузла лівого списку не дорівнює відповідному значенню вузла правого списку*/
+    bool operator!=(Linked2List& other);
+    /* Перевантаження оператору (більше). Повертає true, в разі, якщо 
+    розмір лівого списку більше розміру правого, і false в іншому випадку */
+    bool operator>(Linked2List& other);
+    /* Перевантаження оператору (менше). Повертає true, в разі, якщо розмір 
+    лівого списку менше розміру правого, і false в іншому випадку */
+    bool operator<(Linked2List& other);
+    /* Перевантаження оператору (більше або дорівнює). Повертає true, в разі, якщо розмір 
+    лівого списку більше або дорівнює розміру правого, і false в іншому випадку */
+    bool operator>=(Linked2List& other);
+    /* Перевантаження оператору (менше або дорівнює). Повертає true, в разі, якщо розмір 
+    лівого списку менше або дорівнює розміру правого, і false в іншому випадку */
+    bool operator<=(Linked2List& other);
 
     ///////////////////
 
@@ -48,6 +66,23 @@ class Linked2List {
 
         friend class Linked2List<T>;
     };
+
+    // Клас реверсний ітератор
+    class reverse_iterator {
+        t_node<T>* ptr;
+      public:
+        reverse_iterator();
+        reverse_iterator(t_node<T>* ptr); 
+        reverse_iterator operator ++ ();
+        reverse_iterator operator -- ();
+        bool operator != (const reverse_iterator& guest);
+        bool operator == (const reverse_iterator& guest);
+        T& operator * ();
+
+        friend class Linked2List<T>;
+    };
+
+    ////////////////////////////
 
     // Метод для вставлення вузла перед іншим вузлом у списку
     void insert_before(iterator it, const T& data);
@@ -70,16 +105,55 @@ class Linked2List {
     bool empty() const;
 
     // Метод, що повертає посилання на ітератор першого вузла списку
-    iterator begin();
+    iterator begin() const;
     // Метод, що повертає посилання на ітератор останнього вузла списку
-    iterator end();
+    iterator end() const;
     // Метод, що повертає кількість вузлів у списку
-    size_t size();
+    size_t size() const;
     // Метод для пошуку вузла за значенням
-    iterator search(const T value);
+    iterator search(const T value) const;
 
+
+    //!!!!!!!!!!!!!!!!!! МЕТОДИ ЩО ВИМАГАЮТЬ РЕАЛІЗАЦІЇ !!!!!!!!!!!!!!!///
+
+    // === Доступ до елементів ===
+    T& front();
+    const T& front() const;
+    T& back();
+    const T& back() const;
+
+    // === Swap (для обміну вмістом) ===
+    void swap(Linked2List& other) noexcept;
+
+    // === Assign (перепризначення вмісту) ===
+    void assign(size_t count, const T& value);
+
+    // === Специфічні методи STL list ===
+    void remove(const T& value);
+
+    //! на заняттях була інша реалізація ///
+    template<class UnaryPredicate>
+    void remove_if(UnaryPredicate p);
+    /// 
+
+    void unique();
+    void merge(Linked2List& other); // злиття відсортованих списків
+    void sort();
+
+    // === Константні оператори порівняння ===
+    bool operator==(const Linked2List& other) const;
+    bool operator!=(const Linked2List& other) const;
+    bool operator<(const Linked2List& other) const;
+    bool operator>(const Linked2List& other) const;
+    bool operator<=(const Linked2List& other) const;
+    bool operator>=(const Linked2List& other) const;
 
 };
+
+
+
+
+
 
 
 /////////////////// РЕАЛІЗАЦІЯ МЕТОДІВ /////////////////////////
@@ -91,6 +165,8 @@ t_node<T>::t_node() : data(0), prev(this), next(this) {}
 
 template <typename T>
 t_node<T>::t_node(const T data) : data(data), prev(nullptr), next(nullptr) {}
+
+///////////////////////////////////////////////
 
 /* *** РЕАЛІЗАЦІЯ КОНСТРУКТОРІВ ТА МЕТОДІВ ДЛЯ КЛАСУ ІТЕРАТОРА (Linked2List<T>::iterator) *** */
 
@@ -124,6 +200,42 @@ bool Linked2List<T>::iterator::operator == (const iterator& guest) {
 
 template <typename T>
 T& Linked2List<T>::iterator::operator * () {
+    return ptr -> data;
+}
+
+
+/* *** РЕАЛІЗАЦІЯ КОНСТРУКТОРІВ ТА МЕТОДІВ ДЛЯ КЛАСУ !!!РЕВЕРС!!! ІТЕРАТОРА (Linked2List<T>::reverse_iterator) *** */
+
+template <typename T>
+Linked2List<T>::reverse_iterator::reverse_iterator() : ptr(nullptr) {}
+
+template <typename T>
+Linked2List<T>::reverse_iterator::reverse_iterator(t_node<T>* ptr) : ptr(ptr) {}
+
+template <typename T>
+typename Linked2List<T>::reverse_iterator Linked2List<T>::reverse_iterator::operator ++ () {
+    ptr = ptr -> prev;
+    return *this;
+}
+
+template <typename T>
+typename Linked2List<T>::reverse_iterator Linked2List<T>::reverse_iterator::operator -- () {
+    ptr = ptr -> next;
+    return *this;
+}
+
+template <typename T>
+bool Linked2List<T>::reverse_iterator::operator != (const reverse_iterator& guest) {
+    return ptr != guest.ptr;
+}
+
+template <typename T>
+bool Linked2List<T>::reverse_iterator::operator == (const reverse_iterator& guest) {
+    return ptr == guest.ptr;
+}
+
+template <typename T>
+T& Linked2List<T>::reverse_iterator::operator * () {
     return ptr -> data;
 }
 
@@ -243,22 +355,22 @@ bool Linked2List<T>::empty() const {
 }
 // Метод, що повертає посилання на ітератор першого вузла списку
 template <typename T>
-typename Linked2List<T>::iterator Linked2List<T>::begin() {
+typename Linked2List<T>::iterator Linked2List<T>::begin() const{
     return iterator(sen -> next);
 }
 // Метод, що повертає посилання на ітератор останнього вузла списку
 template <typename T>
-typename Linked2List<T>::iterator Linked2List<T>::end() {
+typename Linked2List<T>::iterator Linked2List<T>::end() const{
     return iterator(sen);
 }
 // Метод, що повертає кількість вузлів у списку
 template <typename T>
-size_t Linked2List<T>::size() {
+size_t Linked2List<T>::size() const{
     return list_size;
 }
 // Метод, що шукає вузол за значенням у списку
 template <typename T>
-typename Linked2List<T>::iterator Linked2List<T>::search(const T value) {
+typename Linked2List<T>::iterator Linked2List<T>::search(const T value) const{
     for (iterator it = begin(); it != end(); ++it) 
         if (*it == value)
             return it;
