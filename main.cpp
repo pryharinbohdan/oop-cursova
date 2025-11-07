@@ -89,7 +89,7 @@ class Linked2List {
     // Метод для вставлення вузла після іншого вузла у списку
     void insert_after(iterator it, const T& data);
     // Метод для видалення вибраного вузла зі списку
-    void erase(iterator it);
+    iterator erase(iterator it);
 
     // Метод для додавання нового вузла (ініціалізованого значенням) у кінець списку
     void push_back(const T data);
@@ -112,41 +112,30 @@ class Linked2List {
     size_t size() const;
     // Метод для пошуку вузла за значенням
     iterator search(const T value) const;
+    // Метод, що шукає вузол за допомогою унарного предикату
+    iterator search(bool (*unare_predicate)(T)) const;
 
 
     //!!!!!!!!!!!!!!!!!! МЕТОДИ ЩО ВИМАГАЮТЬ РЕАЛІЗАЦІЇ !!!!!!!!!!!!!!!///
 
-    // === Доступ до елементів ===
-    T& front();
-    const T& front() const;
-    T& back();
-    const T& back() const;
-
-    // === Swap (для обміну вмістом) ===
+    // Метод Swap (для обміну вмістом) (реалізовано)
     void swap(Linked2List& other) noexcept;
 
-    // === Assign (перепризначення вмісту) ===
-    void assign(size_t count, const T& value);
+    // === Assign (перепризначення вмісту) (Не знаю потрібно чи ні)
+    // void assign(size_t count, const T& value);
 
-    // === Специфічні методи STL list ===
-    void remove(const T& value);
+    // Метод, що видаляє вузли за значенням (реалізовано)
+    void remove(const T& value); 
 
-    //! на заняттях була інша реалізація ///
-    template<class UnaryPredicate>
-    void remove_if(UnaryPredicate p);
+    // Метод, що видаляє вузли, які підходять за умовою унарного предикату (реалізовано)
+    void remove(bool (*unare_predicate)(T)); 
     /// 
 
-    void unique();
-    void merge(Linked2List& other); // злиття відсортованих списків
-    void sort();
+    void unique(); // (Не знаю потрібно чи ні)
 
-    // === Константні оператори порівняння ===
-    bool operator==(const Linked2List& other) const;
-    bool operator!=(const Linked2List& other) const;
-    bool operator<(const Linked2List& other) const;
-    bool operator>(const Linked2List& other) const;
-    bool operator<=(const Linked2List& other) const;
-    bool operator>=(const Linked2List& other) const;
+
+    void merge(Linked2List& other); // злиття відсортованих списків
+    void sort();  // (сортування злиттям) з компаратором
 
 };
 
@@ -254,8 +243,9 @@ Linked2List<T>::Linked2List(const Linked2List& other) : sen(new t_node<T>){
 }
 // Конструктор переміщення
 template <typename T>
-Linked2List<T>::Linked2List(Linked2List&& other) noexcept : sen(other.sen) {
+Linked2List<T>::Linked2List(Linked2List&& other) noexcept : sen(other.sen), list_size(other.list_size) {
     other.sen = nullptr;
+    other.list_size = 0;
 }
 
 /* *** ПЕРВАНТАЖЕННЯ ОПЕРАТОРІВ ****/
@@ -272,21 +262,70 @@ Linked2List<T>& Linked2List<T>::operator=(const Linked2List<T>& other) {
 template <typename T>
 Linked2List<T>& Linked2List<T>::operator=(Linked2List<T>&& other) noexcept {
     sen = other.sen;
+    list_size = other.list_size;
     other.sen = nullptr;
+    other.list_size = 0;
     return *this;
 }
 
-// Оператор для перевірки на рівність
+// Перевантаження оператору (дорівнює)
 template <typename T>
 bool Linked2List<T>::operator==(Linked2List& other) {
     Linked2List<T>::iterator other_it = other.begin();
     for (Linked2List<T>::iterator it = begin(); it != end(); ++it) {
         if (*other_it != *it)
             return false;
+        if (it == end()) && (other != other.end())
+            return false;
+        if (it != end()) && (other == other.end())
+            return false;
         ++other_it;
     }
     return true;
 }
+
+// Перевантаження оператору (не дорівнює)
+template <typename T>
+bool Linked2List<T>::operator!=(Linked2List& other) {
+    return !(this == other);
+}
+
+//Перевантаження оператору (більше)
+template <typename T>
+bool Linked2List<T>::operator>(Linked2List& other) {
+    Linked2List<T>::iterator other_it = other.begin();
+    for (Linked2List<T>::iterator it = begin(); it != end(); ++it) {
+        if (it != end()) && (other == other.end())
+            return true;
+        ++other_it;
+    }
+    return false;
+}
+
+//Перевантаження оператору (менше)
+template <typename T>
+bool Linked2List<T>::operator<(Linked2List& other) {
+    Linked2List<T>::iterator other_it = other.begin();
+    for (Linked2List<T>::iterator it = begin(); it != end(); ++it) {
+        if (it == end()) && (other != other.end())
+            return true;
+        ++other_it;
+    }
+    return false;
+}
+
+//Перевантаження оператору (більше або дорівнює)
+template <typename T>
+bool Linked2List<T>::operator>=(Linked2List& other) {
+    return (this > other) || (this == other);
+}
+
+//Перевантаження оператору (менше або дорівнює)
+template <typename T>
+bool Linked2List<T>::operator<=(Linked2List& other) {
+    return (this < other) || (this == other);
+}
+
 
 /* *** МЕТОДИ СПИСКУ (Linked2List<T>) *** */
 
@@ -313,13 +352,16 @@ void Linked2List<T>::insert_after(typename Linked2List<T>::iterator it, const T&
 
 // Метод, що видаляє обраний вузол списку
 template <typename T>
-void Linked2List<T>::erase(typename Linked2List<T>::iterator it) {
-    t_node<T>* for_delete = it.ptr;
+typename Linked2List<T>::iterator Linked2List<T>::erase(typename Linked2List<T>::iterator it) {
+    t_node<T>* next_elem = it.ptr -> next;
     it.ptr -> prev -> next = it.ptr -> next;
     it.ptr -> next -> prev = it.ptr -> prev;
-    --it;
-    --list_size;
-    delete for_delete;
+    delete it.ptr;
+    if (next_elem != end()) {
+        return iterator(next_elem);
+    } else {
+        return iterator(next_elem -> prev);
+    }
 }
 // Метод для додавання нового вузла (ініціалізованого значенням) у кінець списку
 template <typename T>
@@ -341,17 +383,17 @@ template <typename T>
 void Linked2List<T>::pop_front() {
     erase(begin());
 }
-// Метод для видалення всіх вузлів у списку
-template <typename T>
-void Linked2List<T>::clear() {
-    while (begin() != end()) {
-        pop_back();
-    }
-}
 // Метод, що перевіряє чи пустий список
 template <typename T>
 bool Linked2List<T>::empty() const {
     return begin() == end();
+}
+// Метод для видалення всіх вузлів у списку
+template <typename T>
+void Linked2List<T>::clear() {
+    while (!empty()) {
+        pop_back();
+    }
 }
 // Метод, що повертає посилання на ітератор першого вузла списку
 template <typename T>
@@ -368,6 +410,7 @@ template <typename T>
 size_t Linked2List<T>::size() const{
     return list_size;
 }
+
 // Метод, що шукає вузол за значенням у списку
 template <typename T>
 typename Linked2List<T>::iterator Linked2List<T>::search(const T value) const{
@@ -375,6 +418,40 @@ typename Linked2List<T>::iterator Linked2List<T>::search(const T value) const{
         if (*it == value)
             return it;
     return iterator(nullptr);
+}
+
+// Метод, що шукає вузол за допомогою унарного предикату
+template <typename T>
+typename Linked2List<T>::iterator Linked2List<T>::search(bool (*unare_predicate)(T)) const{
+    for (iterator it = begin(); it != end(); ++it) 
+        if (unare_predicate(*it))
+            return it;
+    return iterator(nullptr);
+}
+
+// Метод Swap (для обміну вмістом)
+/**
+template <typename T>
+void Linked2List<T>::swap(Linked2List& other) noexcept {
+    Linked2List temp = std::move(other);
+    other = std::move(*this);
+    *this = std::move(temp);
+}
+**/
+
+// Метод, що видаляє вузли за значенням
+template <typename T>
+void Linked2List<T>::remove(const T& value) {
+    while (search(value) != iterator(nullptr)) {
+        erase(search(value));
+    }
+}
+// Метод, що видаляє вузли, які підходять за умовою унарного предикату
+template <typename T>
+void Linked2List<T>::remove(bool (*unare_predicate)(T)) {
+    while (search(unare_predicate(T)) != iterator(nullptr)) {
+        erase(search(unare_predicate(T)));
+    }
 }
 
 /* *** ДЕСТРУКТОР СПИСКУ (Linked2List<T>) *** */
