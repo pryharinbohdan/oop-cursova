@@ -275,9 +275,9 @@ bool Linked2List<T>::operator==(Linked2List& other) {
     for (Linked2List<T>::iterator it = begin(); it != end(); ++it) {
         if (*other_it != *it)
             return false;
-        if (it == end()) && (other != other.end())
+        if (it == end() && other_it != other.end())
             return false;
-        if (it != end()) && (other == other.end())
+        if (it != end() && other_it == other.end())
             return false;
         ++other_it;
     }
@@ -295,7 +295,7 @@ template <typename T>
 bool Linked2List<T>::operator>(Linked2List& other) {
     Linked2List<T>::iterator other_it = other.begin();
     for (Linked2List<T>::iterator it = begin(); it != end(); ++it) {
-        if (it != end()) && (other == other.end())
+        if (it != end() && other_it == other.end())
             return true;
         ++other_it;
     }
@@ -307,7 +307,7 @@ template <typename T>
 bool Linked2List<T>::operator<(Linked2List& other) {
     Linked2List<T>::iterator other_it = other.begin();
     for (Linked2List<T>::iterator it = begin(); it != end(); ++it) {
-        if (it == end()) && (other != other.end())
+        if (it == end() && other_it != other.end())
             return true;
         ++other_it;
     }
@@ -357,7 +357,8 @@ typename Linked2List<T>::iterator Linked2List<T>::erase(typename Linked2List<T>:
     it.ptr -> prev -> next = it.ptr -> next;
     it.ptr -> next -> prev = it.ptr -> prev;
     delete it.ptr;
-    if (next_elem != end()) {
+    --list_size;
+    if (iterator(next_elem) != end()) {
         return iterator(next_elem);
     } else {
         return iterator(next_elem -> prev);
@@ -421,13 +422,14 @@ typename Linked2List<T>::iterator Linked2List<T>::search(const T value) const{
 }
 
 // Метод, що шукає вузол за допомогою унарного предикату
-template <typename T>
+/*template <typename T>
 typename Linked2List<T>::iterator Linked2List<T>::search(bool (*unare_predicate)(T)) const{
     for (iterator it = begin(); it != end(); ++it) 
         if (unare_predicate(*it))
             return it;
     return iterator(nullptr);
 }
+*/
 
 // Метод Swap (для обміну вмістом)
 /**
@@ -442,16 +444,40 @@ void Linked2List<T>::swap(Linked2List& other) noexcept {
 // Метод, що видаляє вузли за значенням
 template <typename T>
 void Linked2List<T>::remove(const T& value) {
-    while (search(value) != iterator(nullptr)) {
-        erase(search(value));
+    iterator it = begin();
+    while (it != end()) {
+        if (*it == value) {
+            it = erase(it);
+        } else {
+            ++it;
+        }
     }
 }
-// Метод, що видаляє вузли, які підходять за умовою унарного предикату
-template <typename T>
-void Linked2List<T>::remove(bool (*unare_predicate)(T)) {
-    while (search(unare_predicate(T)) != iterator(nullptr)) {
-        erase(search(unare_predicate(T)));
+// Метод, що видаляє вузли, які підходять за умовою унарного предикату   !!!!
+/*template <typename T>
+void Linked2List<T>::remove(bool (*unare_predicate)(const T&)) {
+    while (search(unare_predicate()) != iterator(nullptr)) {
+        erase(search(unare_predicate));
     }
+}*/
+
+// Метод, що зливає відсортований поточний список і відсортований переданий список в поточний список
+template <typename T>
+void Linked2List<T>::merge(Linked2List& other) {
+    auto it = begin();
+    auto jt = other.begin();
+    
+    while (jt != other.end()) {
+        if (it == end() || *jt < *it) {
+            insert_before(it, *jt);
+            ++jt;
+        } else {
+            ++it;
+        }
+    }
+    
+    other.clear();  
+   
 }
 
 /* *** ДЕСТРУКТОР СПИСКУ (Linked2List<T>) *** */
@@ -467,8 +493,7 @@ Linked2List<T>::~Linked2List() {
 int main() {
     // створюємо об'єкт типу Linked2List
 
-    Linked2List < int > ls;
-    Linked2List < int > ls_copy;
+    Linked2List < int > ls, ls_copy, a, b;
 
     
     for (int i = 0; i < 10; ++i) {
@@ -488,12 +513,29 @@ int main() {
         }
     }
 
+    for (int i = 0; i < 10; ++i) {
+        a.push_back(i);
+    }
+
+    for (int i = 5; i < 12; ++i) {
+        b.push_back(i);
+    }
+
+    a.merge(b);
+
+
+    for (auto it = a.begin(); it != a.end(); ++it) {
+        std::cout << *it << " ";
+    }
+
     ls.erase(ls.search(3));
+
+    /*
 
     //цикл ітератор
     for (Linked2List < int > :: iterator it = ls.begin(); it != ls.end(); ++it) {
         std::cout << *it << " ";
-    }
+    }*/
 
     std::cout << std::endl;
 
