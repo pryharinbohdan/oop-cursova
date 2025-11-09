@@ -113,7 +113,7 @@ class Linked2List {
     // Метод для пошуку вузла за значенням
     iterator search(const T value) const;
     // Метод, що шукає вузол за допомогою унарного предикату
-    iterator search(bool (*unare_predicate)(T)) const;
+    iterator search(bool (*unare_predicate)(const T&)) const;
 
 
     //!!!!!!!!!!!!!!!!!! МЕТОДИ ЩО ВИМАГАЮТЬ РЕАЛІЗАЦІЇ !!!!!!!!!!!!!!!///
@@ -128,7 +128,7 @@ class Linked2List {
     void remove(const T& value); 
 
     // Метод, що видаляє вузли, які підходять за умовою унарного предикату (реалізовано)
-    void remove(bool (*unare_predicate)(T)); 
+    void remove(bool (*unare_predicate)(const T&)); 
     /// 
 
     void unique(); // (Не знаю потрібно чи ні)
