@@ -237,8 +237,8 @@ template <typename T>
 Linked2List<T>::Linked2List() : sen(new t_node<T>), list_size(0) {}
 // Конструктор копіювання
 template <typename T>
-Linked2List<T>::Linked2List(const Linked2List& other) : sen(new t_node<T>){
-    for (iterator it = other.begin(); it != other.end(); ++it)
+Linked2List<T>::Linked2List(const Linked2List& other) : sen(new t_node<T>), list_size(0){
+    for (auto it = other.begin(); it != other.end(); ++it)
         push_back(*it);
 }
 // Конструктор переміщення
@@ -254,7 +254,7 @@ Linked2List<T>::Linked2List(Linked2List&& other) noexcept : sen(other.sen), list
 template <typename T>
 Linked2List<T>& Linked2List<T>::operator=(const Linked2List<T>& other) {
     sen = new t_node<T>;
-    for (iterator it = other.begin(); it != other.end(); ++it)
+    for (auto it = other.begin(); it != other.end(); ++it)
         push_back(*it);
     return *this;
 }
@@ -353,6 +353,7 @@ void Linked2List<T>::push_back(const T data) {
 // Метод для видалення останнього вузла у списку
 template <typename T>
 void Linked2List<T>::pop_back() {
+    if (empty()) return;
     erase(--end());
 }
 // Метод для додавання нового вузла (ініціалізованого значенням) на початок списку
@@ -363,6 +364,7 @@ void Linked2List<T>::push_front(const T data) {
 // Метод для видалення першого вузла у списку
 template <typename T>
 void Linked2List<T>::pop_front() {
+    if (empty()) return;
     erase(begin());
 }
 // Метод, що перевіряє чи пустий список
@@ -396,21 +398,20 @@ size_t Linked2List<T>::size() const{
 // Метод, що шукає вузол за значенням у списку
 template <typename T>
 typename Linked2List<T>::iterator Linked2List<T>::search(const T value) const{
-    for (iterator it = begin(); it != end(); ++it) 
+    for (auto it = begin(); it != end(); ++it) 
         if (*it == value)
             return it;
-    return iterator(nullptr);
+    return end();
 }
 
 // Метод, що шукає вузол за допомогою унарного предикату
-/*template <typename T>
-typename Linked2List<T>::iterator Linked2List<T>::search(bool (*unare_predicate)(T)) const{
-    for (iterator it = begin(); it != end(); ++it) 
-        if (unare_predicate(*it))
-            return it;
-    return iterator(nullptr);
+template <typename T>
+typename Linked2List<T>::iterator Linked2List<T>::search(bool (*unare_predicate)(const T&)) const {
+    for (auto it = begin(); it != end(); ++it)
+        if (unare_predicate(*it)) return it;
+    return end();
 }
-*/
+
 
 // Метод Swap (для обміну вмістом)
 /**
@@ -425,7 +426,7 @@ void Linked2List<T>::swap(Linked2List& other) noexcept {
 // Метод, що видаляє вузли за значенням
 template <typename T>
 void Linked2List<T>::remove(const T& value) {
-    iterator it = begin();
+    auto it = begin();
     while (it != end()) {
         if (*it == value) {
             it = erase(it);
@@ -435,12 +436,15 @@ void Linked2List<T>::remove(const T& value) {
     }
 }
 // Метод, що видаляє вузли, які підходять за умовою унарного предикату   !!!!
-/*template <typename T>
+template <typename T>
 void Linked2List<T>::remove(bool (*unare_predicate)(const T&)) {
-    while (search(unare_predicate()) != iterator(nullptr)) {
-        erase(search(unare_predicate));
+    for (auto it = begin(); it != end(); ) {
+        if (unare_predicate(*it))
+            it = erase(it);
+        else
+            ++it;
     }
-}*/
+}
 
 // Метод, що зливає відсортований поточний список і відсортований переданий список в поточний список
 template <typename T>
@@ -488,7 +492,7 @@ int main() {
         std::cout << "Error" << std::endl;
     }
 
-    for (Linked2List < int > :: iterator it = ls.begin(); it != ls.end(); ++it) {
+    for (auto it = ls.begin(); it != ls.end(); ++it) {
         if (*it % 2 == 0) {
             ls.erase(it);
         }
@@ -514,7 +518,7 @@ int main() {
     /*
 
     //цикл ітератор
-    for (Linked2List < int > :: iterator it = ls.begin(); it != ls.end(); ++it) {
+    for (auto it = ls.begin(); it != ls.end(); ++it) {
         std::cout << *it << " ";
     }*/
 
