@@ -343,11 +343,7 @@ typename Linked2List<T>::iterator Linked2List<T>::erase(typename Linked2List<T>:
     it.ptr -> next -> prev = it.ptr -> prev;
     delete it.ptr;
     --list_size;
-    if (iterator(next_elem) != end()) {
-        return iterator(next_elem);
-    } else {
-        return iterator(next_elem -> prev);
-    }
+    return iterator(next_elem);
 }
 // Метод для додавання нового вузла (ініціалізованого значенням) у кінець списку
 template <typename T>
