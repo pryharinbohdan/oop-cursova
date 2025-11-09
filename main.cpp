@@ -7,7 +7,7 @@ struct t_node {
     t_node* prev;
     t_node* next;
     t_node(); // Конструктор за замовченням (створює sentinel)
-    t_node(const T data); // Конструктор з параметром
+    t_node(const T& data); // Конструктор з параметром
 };
 
 template <typename T>
@@ -29,25 +29,25 @@ class Linked2List {
     Linked2List& operator=(const Linked2List& other);
     /* Перевантаження оператора переміщення. Передає ресурси з правого списку в лівий, 
     обнуляючи дані правого списку. Повертає посилання на лівий список.*/
-    Linked2List& operator=(Linked2List&& other) noexcept;
+    Linked2List& operator=(const Linked2List&& other) noexcept;
     /* Перевантаження оператора (==). Повертає true, якщо всі значення вузлів лівого списку
     дорівнюють відповідним значенням вузлів правого списку. */
-    bool operator==(Linked2List& other);
+    bool operator==(const Linked2List& other) const;
     /* Перевантаження оператору (не дорівнює). Повертає true, в разі, якщо хоча б одне 
     значення вузла лівого списку не дорівнює відповідному значенню вузла правого списку*/
-    bool operator!=(Linked2List& other);
+    bool operator!=(const Linked2List& other) const;
     /* Перевантаження оператору (більше). Повертає true, в разі, якщо 
     розмір лівого списку більше розміру правого, і false в іншому випадку */
-    bool operator>(Linked2List& other);
+    bool operator>(const Linked2List& other) const;
     /* Перевантаження оператору (менше). Повертає true, в разі, якщо розмір 
     лівого списку менше розміру правого, і false в іншому випадку */
-    bool operator<(Linked2List& other);
+    bool operator<(const Linked2List& other) const;
     /* Перевантаження оператору (більше або дорівнює). Повертає true, в разі, якщо розмір 
     лівого списку більше або дорівнює розміру правого, і false в іншому випадку */
-    bool operator>=(Linked2List& other);
+    bool operator>=(const Linked2List& other) const;
     /* Перевантаження оператору (менше або дорівнює). Повертає true, в разі, якщо розмір 
     лівого списку менше або дорівнює розміру правого, і false в іншому випадку */
-    bool operator<=(Linked2List& other);
+    bool operator<=(const Linked2List& other)const;
 
     ///////////////////
 
@@ -150,10 +150,10 @@ class Linked2List {
 // Конструктори вузла (t_node<T>)
 
 template <typename T>
-t_node<T>::t_node() : data(0), prev(this), next(this) {}
+t_node<T>::t_node() : data(), prev(this), next(this) {}
 
 template <typename T>
-t_node<T>::t_node(const T data) : data(data), prev(nullptr), next(nullptr) {}
+t_node<T>::t_node(const T& data) : data(data), prev(nullptr), next(nullptr) {}
 
 ///////////////////////////////////////////////
 
@@ -260,7 +260,7 @@ Linked2List<T>& Linked2List<T>::operator=(const Linked2List<T>& other) {
 }
 // Оператор переміщення
 template <typename T>
-Linked2List<T>& Linked2List<T>::operator=(Linked2List<T>&& other) noexcept {
+Linked2List<T>& Linked2List<T>::operator=(const Linked2List<T>&& other) noexcept {
     sen = other.sen;
     list_size = other.list_size;
     other.sen = nullptr;
@@ -270,59 +270,44 @@ Linked2List<T>& Linked2List<T>::operator=(Linked2List<T>&& other) noexcept {
 
 // Перевантаження оператору (дорівнює)
 template <typename T>
-bool Linked2List<T>::operator==(Linked2List& other) {
-    Linked2List<T>::iterator other_it = other.begin();
-    for (Linked2List<T>::iterator it = begin(); it != end(); ++it) {
-        if (*other_it != *it)
-            return false;
-        if (it == end() && other_it != other.end())
-            return false;
-        if (it != end() && other_it == other.end())
-            return false;
-        ++other_it;
+bool Linked2List<T>::operator==(const Linked2List<T>& other) const {
+    if (list_size != other.list_size) return false;
+    auto it1 = begin();
+    auto it2 = other.begin();
+    for (; it1 != end(); ++it1, ++it2) {
+        if (*it1 != *it2) return false;
     }
     return true;
 }
 
+
 // Перевантаження оператору (не дорівнює)
 template <typename T>
-bool Linked2List<T>::operator!=(Linked2List& other) {
-    return !(this == other);
+bool Linked2List<T>::operator!=(const Linked2List& other) const{
+    return !(*this == other);
 }
 
 //Перевантаження оператору (більше)
 template <typename T>
-bool Linked2List<T>::operator>(Linked2List& other) {
-    Linked2List<T>::iterator other_it = other.begin();
-    for (Linked2List<T>::iterator it = begin(); it != end(); ++it) {
-        if (it != end() && other_it == other.end())
-            return true;
-        ++other_it;
-    }
-    return false;
+bool Linked2List<T>::operator>(const Linked2List& other) const {
+    return list_size > other.list_size;
 }
 
 //Перевантаження оператору (менше)
 template <typename T>
-bool Linked2List<T>::operator<(Linked2List& other) {
-    Linked2List<T>::iterator other_it = other.begin();
-    for (Linked2List<T>::iterator it = begin(); it != end(); ++it) {
-        if (it == end() && other_it != other.end())
-            return true;
-        ++other_it;
-    }
-    return false;
+bool Linked2List<T>::operator<(const Linked2List& other) const {
+    return list_size < other.list_size;
 }
 
 //Перевантаження оператору (більше або дорівнює)
 template <typename T>
-bool Linked2List<T>::operator>=(Linked2List& other) {
+bool Linked2List<T>::operator>=(const Linked2List& other) const {
     return (this > other) || (this == other);
 }
 
 //Перевантаження оператору (менше або дорівнює)
 template <typename T>
-bool Linked2List<T>::operator<=(Linked2List& other) {
+bool Linked2List<T>::operator<=(const Linked2List& other) const{
     return (this < other) || (this == other);
 }
 
