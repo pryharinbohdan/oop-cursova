@@ -414,14 +414,11 @@ typename Linked2List<T>::iterator Linked2List<T>::search(bool (*unare_predicate)
 
 
 // Метод Swap (для обміну вмістом)
-/**
 template <typename T>
 void Linked2List<T>::swap(Linked2List& other) noexcept {
-    Linked2List temp = std::move(other);
-    other = std::move(*this);
-    *this = std::move(temp);
+    std::swap(sen, other.sen);
+    std::swap(list_size, other.list_size);
 }
-**/
 
 // Метод, що видаляє вузли за значенням
 template <typename T>
