@@ -63,6 +63,7 @@ class Linked2List {
         bool operator != (const iterator& guest);
         bool operator == (const iterator& guest);
         T& operator * ();
+        T* operator->();
 
         friend class Linked2List<T>;
     };
@@ -78,6 +79,7 @@ class Linked2List {
         bool operator != (const reverse_iterator& guest);
         bool operator == (const reverse_iterator& guest);
         T& operator * ();
+        T* operator -> ();
 
         friend class Linked2List<T>;
     };
@@ -135,8 +137,8 @@ class Linked2List {
 
 
     void merge(Linked2List& other); // злиття відсортованих списків
-    void sort();  // (сортування злиттям) з компаратором
-
+    void sort();  // (сортування злиттям) з компаратором !!!!!!!! РЕАЛІЗУВАТИ
+    void circular(const bool makeCirc); // РОБИТЬ СПИСОК ЦІИКЛІЧНИМ (ВІД'ЄДНУЄ SENTINEL)
 };
 
 
@@ -192,6 +194,12 @@ T& Linked2List<T>::iterator::operator * () {
     return ptr -> data;
 }
 
+template <typename T>
+T* Linked2List<T>::iterator::operator -> () {
+    return &(ptr -> data);
+}
+
+
 
 /* *** РЕАЛІЗАЦІЯ КОНСТРУКТОРІВ ТА МЕТОДІВ ДЛЯ КЛАСУ !!!РЕВЕРС!!! ІТЕРАТОРА (Linked2List<T>::reverse_iterator) *** */
 
@@ -227,6 +235,12 @@ template <typename T>
 T& Linked2List<T>::reverse_iterator::operator * () {
     return ptr -> data;
 }
+
+template <typename T>
+T* Linked2List<T>::reverse_iterator::operator -> () {
+    return &(ptr -> data);
+}
+
 
 /////////////////////////////
 
@@ -339,6 +353,11 @@ void Linked2List<T>::insert_after(typename Linked2List<T>::iterator it, const T&
 template <typename T>
 typename Linked2List<T>::iterator Linked2List<T>::erase(typename Linked2List<T>::iterator it) {
     t_node<T>* next_elem = it.ptr -> next;
+    if (it.ptr == sen -> prev && sen -> prev -> next != sen) {
+        sen -> prev = it.ptr -> prev;
+    } else if (it.ptr == sen -> next && sen -> next -> prev != sen) {
+        sen -> next = it.ptr -> next;
+    }
     it.ptr -> prev -> next = it.ptr -> next;
     it.ptr -> next -> prev = it.ptr -> prev;
     delete it.ptr;
@@ -462,64 +481,80 @@ void Linked2List<T>::merge(Linked2List& other) {
    
 }
 
+/**
+template <typename T>
+void Linked2List<T>::sort() {}
+*/
+
+/* Метод, що робить зв'язний список циклічним, приймає як аргумент bool значення:
+    true, якщо треба зробити із класичного списку зациклений список
+    false, якщо з циклічного треба перетворити у класичний */
+template <typename T>
+void Linked2List<T>::circular(const bool makeCirc) {
+    if (makeCirc && sen -> prev -> next == sen) {
+        sen -> prev -> next = sen -> next;
+        sen -> next -> prev = sen -> prev;
+    } else if (!makeCirc && sen -> prev -> next != sen) {
+        sen -> prev -> next = sen;
+        sen -> next -> prev = sen;
+    }
+}
+
 /* *** ДЕСТРУКТОР СПИСКУ (Linked2List<T>) *** */
 
 template <typename T>
 Linked2List<T>::~Linked2List() {
+    // ЯКЩО КОРИСТУВАЧ ЗАЦИКЛИВ НАШ СПИСОК, ПРИВОДИМО ЙОГО ДО КЛАСИЧНОГО ВИГЛЯДУ, ЩОБ ОЧИСТИТИ ПАМ'ЯТЬ
+    if (sen -> prev -> next != sen) {
+        circular(false);
+    }
     clear();
     delete sen;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /////////////////////////// ОСНОВНА ПРОГРАМА ///////////////////////////////
+
+// СИСТЕМА УПРАВЛІННЯ ПЛЕЙЛИСТОМ МУЗИКИ
+
+struct point{
+    int x, y, z;
+    point() : x(0), y(0), z(0) {}
+    point(const int x, const int y, const int z) : x(x), y(y), z(z) {}
+};
 
 int main() {
     // створюємо об'єкт типу Linked2List
 
-    Linked2List < int > ls, ls_copy, a, b;
+    Linked2List < int > ls;
+    int n = 5;
 
-    
-    for (int i = 0; i < 10; ++i) {
+    for (int i = 0; i < n; ++i) {
         ls.push_back(i);
-        ls_copy.push_back(i);
     }
 
-    if (ls == ls_copy) {
-        std::cout << "Success" << std::endl;
-    } else {
-        std::cout << "Error" << std::endl;
+    ls.circular(true);
+    auto it = ls.begin();
+
+    for (auto a : ls) {
+        std::cout << a << std::endl;
     }
-
-    for (auto it = ls.begin(); it != ls.end(); ++it) {
-        if (*it % 2 == 0) {
-            ls.erase(it);
-        }
-    }
-
-    for (int i = 0; i < 10; ++i) {
-        a.push_back(i);
-    }
-
-    for (int i = 5; i < 12; ++i) {
-        b.push_back(i);
-    }
-
-    a.merge(b);
-
-
-    for (auto it = a.begin(); it != a.end(); ++it) {
-        std::cout << *it << " ";
-    }
-
-    ls.erase(ls.search(3));
-
-    /*
-
-    //цикл ітератор
-    for (auto it = ls.begin(); it != ls.end(); ++it) {
-        std::cout << *it << " ";
-    }*/
-
-    std::cout << std::endl;
+    
 
     return 0;
 }
