@@ -532,27 +532,32 @@ Linked2List<T>::~Linked2List() {
 
 // СИСТЕМА УПРАВЛІННЯ ПЛЕЙЛИСТОМ МУЗИКИ
 
-struct point{
-    int x, y, z;
-    point() : x(0), y(0), z(0) {}
-    point(const int x, const int y, const int z) : x(x), y(y), z(z) {}
+struct song {
+    char name[100];
+    char author[100];
+    int howLong;
+    song() : name(""), author(""), howLong(0) {}
+    song(char* name, char* author, const int howLong) : howLong(howLong) {
+        std::copy(name, name+100, this -> name);
+        std::copy(author, author+100, this->author);
+    }
 };
 
 int main() {
     // створюємо об'єкт типу Linked2List
 
-    Linked2List < int > ls;
+    Linked2List < song > ls;
     int n = 5;
 
     for (int i = 0; i < n; ++i) {
-        ls.push_back(i);
+        ls.push_back(song("Hello", "Maria", 210));
     }
 
-    ls.circular(true);
+    //ls.circular(true);
     auto it = ls.begin();
 
     for (auto a : ls) {
-        std::cout << a << std::endl;
+        std::cout << a.name << std::endl;
     }
     
 
