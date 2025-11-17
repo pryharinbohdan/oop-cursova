@@ -112,32 +112,32 @@ class Linked2List {
     iterator end() const;
     // Метод, що повертає кількість вузлів у списку
     size_t size() const;
+
+    /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+
     // Метод для пошуку вузла за значенням
-    iterator search(const T value) const;
-    // Метод, що шукає вузол за допомогою унарного предикату
-    iterator search(bool (*unare_predicate)(const T&)) const;
+    iterator find(const T value) const; 
+    // Метод, що шукає вузол за допомогою компаратора
+    iterator find(bool (*compare)(T&)) const;
 
+    /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 
-    //!!!!!!!!!!!!!!!!!! МЕТОДИ ЩО ВИМАГАЮТЬ РЕАЛІЗАЦІЇ !!!!!!!!!!!!!!!///
-
-    // Метод Swap (для обміну вмістом) (реалізовано)
+    // Метод Swap (для обміну вмістом)
     void swap(Linked2List& other) noexcept;
 
-    // === Assign (перепризначення вмісту) (Не знаю потрібно чи ні)
-    // void assign(size_t count, const T& value);
-
-    // Метод, що видаляє вузли за значенням (реалізовано)
+    // Метод, що видаляє вузли за значенням
     void remove(const T& value); 
 
-    // Метод, що видаляє вузли, які підходять за умовою унарного предикату (реалізовано)
-    void remove(bool (*unare_predicate)(const T&)); 
-    /// 
+    // Метод, що видаляє вузли, які підходять за умовою унарного предикату
+    void remove(bool (*compare)(T&)); 
 
-    void unique(); // (Не знаю потрібно чи ні)
+    // Метод, що виконує злиття двох відсортованих списків
+    void merge(Linked2List& other);
 
+    // Метод (сортування злиттям) з компаратором
+    void sort(bool (*compare)(T&, T&));
 
-    void merge(Linked2List& other); // злиття відсортованих списків
-    void sort();  // (сортування злиттям) з компаратором !!!!!!!! РЕАЛІЗУВАТИ
+    // Метод, що робить класичний список циклічним (аргумент true), або навпаки, робить циклічний список - класичним (аргумент false)
     void circular(const bool makeCirc); // РОБИТЬ СПИСОК ЦІИКЛІЧНИМ (ВІД'ЄДНУЄ SENTINEL)
 };
 
@@ -416,7 +416,7 @@ size_t Linked2List<T>::size() const{
 
 // Метод, що шукає вузол за значенням у списку
 template <typename T>
-typename Linked2List<T>::iterator Linked2List<T>::search(const T value) const{
+typename Linked2List<T>::iterator Linked2List<T>::find(T value) const{
     for (auto it = begin(); it != end(); ++it) 
         if (*it == value)
             return it;
@@ -425,9 +425,9 @@ typename Linked2List<T>::iterator Linked2List<T>::search(const T value) const{
 
 // Метод, що шукає вузол за допомогою унарного предикату
 template <typename T>
-typename Linked2List<T>::iterator Linked2List<T>::search(bool (*unare_predicate)(const T&)) const {
+typename Linked2List<T>::iterator Linked2List<T>::find(bool (*compare)(T&)) const {
     for (auto it = begin(); it != end(); ++it)
-        if (unare_predicate(*it)) return it;
+        if (compare(*it)) return it;
     return end();
 }
 
@@ -451,11 +451,11 @@ void Linked2List<T>::remove(const T& value) {
         }
     }
 }
-// Метод, що видаляє вузли, які підходять за умовою унарного предикату   !!!!
+// Метод, що видаляє вузли, які підходять за умовою компаратору !!!!
 template <typename T>
-void Linked2List<T>::remove(bool (*unare_predicate)(const T&)) {
+void Linked2List<T>::remove(bool (*compare)(T&)) {
     for (auto it = begin(); it != end(); ) {
-        if (unare_predicate(*it))
+        if (compare(*it))
             it = erase(it);
         else
             ++it;
@@ -481,10 +481,31 @@ void Linked2List<T>::merge(Linked2List& other) {
    
 }
 
-/**
+// Метод (сортування вставкою) за неспаданням з компаратором
 template <typename T>
-void Linked2List<T>::sort() {}
-*/
+void Linked2List<T>::sort(bool (*compare)(T&, T&)) {
+    if (size() <= 1) return;
+    auto it = begin();
+    ++it;
+    
+    while (it != end()) {
+        T key = *it;
+        auto pos = begin();
+        
+        while (pos != it && compare(*pos, key)) {
+            ++pos;
+        }
+        
+        if (pos != it) {
+            auto temp = it;
+            ++it;
+            insert_before(pos, key);
+            erase(temp);
+        } else {
+            ++it;
+        }
+    }
+}
 
 /* Метод, що робить зв'язний список циклічним, приймає як аргумент bool значення:
     true, якщо треба зробити із класичного списку зациклений список
@@ -543,22 +564,52 @@ struct song {
     }
 };
 
+bool up(int& a, int& b) {
+    return a <= b;
+}
+
+bool down(int& a, int& b) {
+    return a >= b;
+}
+
+bool is_pal(int& num) {
+    int num_copy = num;
+    int r_num = 0;
+
+    while (num_copy) {
+        r_num = r_num * 10 + num_copy % 10;
+        num_copy /= 10;
+    }
+
+    return num == r_num;
+}
+
 int main() {
     // створюємо об'єкт типу Linked2List
 
-    Linked2List < song > ls;
-    int n = 5;
+    Linked2List < int > ls;
+    int n = 1000;
 
     for (int i = 0; i < n; ++i) {
-        ls.push_back(song("Hello", "Maria", 210));
+        ls.push_back(n-i);
     }
+/*
+    for (auto a : ls) {
+        std::cout << a << " ";
+    }
+
+    std::cout << std::endl;
 
     //ls.circular(true);
-    auto it = ls.begin();
+    ls.sort(up);
+
+
 
     for (auto a : ls) {
-        std::cout << a.name << std::endl;
-    }
+        std::cout << a << " ";
+    }*/
+
+    std::cout << *ls.find(is_pal)<< std::endl;
     
 
     return 0;
