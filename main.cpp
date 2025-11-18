@@ -110,17 +110,17 @@ class Linked2List {
     iterator begin() const;
     // Метод, що повертає посилання на ітератор останнього вузла списку
     iterator end() const;
+    // Метод, що повертає посилання на реверс ітератор останнього вузла списку
+    reverse_iterator rbegin() const;
+    // Метод, що повертає посилання на реверс ітератор першого вузла списку
+    reverse_iterator rend() const;
     // Метод, що повертає кількість вузлів у списку
     size_t size() const;
 
-    /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
-
     // Метод для пошуку вузла за значенням
     iterator find(const T value) const; 
-    // Метод, що шукає вузол за допомогою компаратора
-    iterator find(bool (*compare)(T&)) const;
-
-    /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+    // Метод, що шукає вузол за допомогою унарного предикату
+    iterator find(bool (*unary_predicate)(T&)) const;
 
     // Метод Swap (для обміну вмістом)
     void swap(Linked2List& other) noexcept;
@@ -129,7 +129,7 @@ class Linked2List {
     void remove(const T& value); 
 
     // Метод, що видаляє вузли, які підходять за умовою унарного предикату
-    void remove(bool (*compare)(T&)); 
+    void remove(bool (*unary_predicate)(T&)); 
 
     // Метод, що виконує злиття двох відсортованих списків
     void merge(Linked2List& other);
@@ -408,6 +408,16 @@ template <typename T>
 typename Linked2List<T>::iterator Linked2List<T>::end() const{
     return iterator(sen);
 }
+// Метод, що повертає посилання на реверс ітератор останнього вузла списку
+template <typename T>
+typename Linked2List<T>::reverse_iterator Linked2List<T>::rbegin() const{
+    return reverse_iterator(sen -> prev);
+}
+// Метод, що повертає посилання на реверс ітератор першого вузла списку
+template <typename T>
+typename Linked2List<T>::reverse_iterator Linked2List<T>::rend() const{
+    return reverse_iterator(sen);
+}
 // Метод, що повертає кількість вузлів у списку
 template <typename T>
 size_t Linked2List<T>::size() const{
@@ -425,9 +435,9 @@ typename Linked2List<T>::iterator Linked2List<T>::find(T value) const{
 
 // Метод, що шукає вузол за допомогою унарного предикату
 template <typename T>
-typename Linked2List<T>::iterator Linked2List<T>::find(bool (*compare)(T&)) const {
+typename Linked2List<T>::iterator Linked2List<T>::find(bool (*unary_predicate)(T&)) const {
     for (auto it = begin(); it != end(); ++it)
-        if (compare(*it)) return it;
+        if (unary_predicate(*it)) return it;
     return end();
 }
 
@@ -451,11 +461,11 @@ void Linked2List<T>::remove(const T& value) {
         }
     }
 }
-// Метод, що видаляє вузли, які підходять за умовою компаратору !!!!
+// Метод, що видаляє вузли, які підходять за умовою унарного предикату !!!!
 template <typename T>
-void Linked2List<T>::remove(bool (*compare)(T&)) {
+void Linked2List<T>::remove(bool (*unary_predicate)(T&)) {
     for (auto it = begin(); it != end(); ) {
-        if (compare(*it))
+        if (unary_predicate(*it))
             it = erase(it);
         else
             ++it;
