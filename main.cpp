@@ -64,7 +64,6 @@ class Linked2List {
         bool operator == (const iterator& guest);
         T& operator * ();
         T* operator->();
-
         friend class Linked2List<T>;
     };
 
@@ -118,7 +117,7 @@ class Linked2List {
     size_t size() const;
 
     // Метод для пошуку вузла за значенням
-    iterator find(const T value) const; 
+    iterator find(const T& value) const; 
     // Метод, що шукає вузол за допомогою унарного предикату
     iterator find(bool (*unary_predicate)(T&)) const;
 
@@ -426,7 +425,7 @@ size_t Linked2List<T>::size() const{
 
 // Метод, що шукає вузол за значенням у списку
 template <typename T>
-typename Linked2List<T>::iterator Linked2List<T>::find(T value) const{
+typename Linked2List<T>::iterator Linked2List<T>::find(const T& value) const{
     for (auto it = begin(); it != end(); ++it) 
         if (*it == value)
             return it;
@@ -562,7 +561,7 @@ Linked2List<T>::~Linked2List() {
 /////////////////////////// ОСНОВНА ПРОГРАМА ///////////////////////////////
 
 // СИСТЕМА УПРАВЛІННЯ ПЛЕЙЛИСТОМ МУЗИКИ
-
+/*
 struct song {
     char name[100];
     char author[100];
@@ -572,55 +571,161 @@ struct song {
         std::copy(name, name+100, this -> name);
         std::copy(author, author+100, this->author);
     }
+};*/
+
+// ToDo LIST СПИСОК ЗАВДАНЬ
+
+#include <ctime>
+
+// Допоміжна функція порівняння рядків (повертає true якщо рівні)
+bool strcmp_equal(const char* a, const char* b) {
+    size_t i = 0;
+    while (a[i] != '\0' && b[i] != '\0') {
+        if (a[i] != b[i]) return false;
+        ++i;
+    }
+    return a[i] == b[i];
+}
+
+// Допоміжна функція копіювання рядка
+void strcpy_custom(char* dest, const char* src) {
+    size_t i = 0;
+    while (src[i] != '\0') {
+        dest[i] = src[i];
+        ++i;
+    }
+    dest[i] = '\0';
+}
+
+// Допоміжна функція визначення довжини рядка
+size_t strlen_custom(const char* str) {
+    size_t len = 0;
+    while (str[len] != '\0') ++len;
+    return len;
+}
+
+struct Task {
+    char* description;
+    size_t n;
+    time_t whenAdded;
+    
+    Task() : n(1), whenAdded(time(nullptr)) {
+        description = new char[n];
+        description[0] = '\0';
+    }
+    
+    Task(const char* desc) : whenAdded(time(nullptr)) {
+        n = strlen_custom(desc) + 1;
+        description = new char[n];
+        strcpy_custom(description, desc);
+    }
+    
+    // Конструктор копіювання
+    Task(const Task& other) : n(other.n), whenAdded(other.whenAdded) {
+        description = new char[n];
+        strcpy_custom(description, other.description);
+    }
+    
+    // Оператор присвоєння
+    Task& operator=(const Task& other) {
+        if(this != &other) {
+            delete[] description;
+            n = other.n;
+            whenAdded = other.whenAdded;
+            description = new char[n];
+            strcpy_custom(description, other.description);
+        }
+        return *this;
+    }
+    
+    // Оператор < (порівняння часу)
+    bool operator<(const Task& other) const {
+        return whenAdded < other.whenAdded;
+    }
+    
+    // Оператор > (порівняння часу)
+    bool operator>(const Task& other) const {
+        return whenAdded > other.whenAdded;
+    }
+    
+    // Оператор == (рівність часу та рядка)
+    bool operator==(const Task& other) const {
+        if(whenAdded != other.whenAdded) return false;
+        return strcmp_equal(description, other.description);
+    }
+    
+    // Оператор != 
+    bool operator!=(const Task& other) const {
+        return !(*this == other);
+    }
+    
+    // Оператор <= (менше за часом або рівні)
+    bool operator<=(const Task& other) const {
+        return (*this < other) || (*this == other);
+    }
+    
+    // Оператор >= (більше за часом або рівні)
+    bool operator>=(const Task& other) const {
+        return (*this > other) || (*this == other);
+    }
+    
+    ~Task() {
+        delete[] description;
+    }
 };
 
-bool up(int& a, int& b) {
+bool up(Task& a, Task& b) {
     return a <= b;
 }
 
-bool down(int& a, int& b) {
+bool down(Task& a, Task& b) {
     return a >= b;
 }
 
-bool is_pal(int& num) {
-    int num_copy = num;
-    int r_num = 0;
-
-    while (num_copy) {
-        r_num = r_num * 10 + num_copy % 10;
-        num_copy /= 10;
-    }
-
-    return num == r_num;
-}
-
 int main() {
-    // створюємо об'єкт типу Linked2List
-
-    Linked2List < int > ls;
-    int n = 1000;
-
-    for (int i = 0; i < n; ++i) {
-        ls.push_back(n-i);
-    }
-/*
-    for (auto a : ls) {
-        std::cout << a << " ";
-    }
-
-    std::cout << std::endl;
-
-    //ls.circular(true);
-    ls.sort(up);
-
-
-
-    for (auto a : ls) {
-        std::cout << a << " ";
-    }*/
-
-    std::cout << *ls.find(is_pal)<< std::endl;
+    Linked2List<Task> ls;
     
-
+    bool isExit = false;
+    
+    do {
+        ls.sort(down);
+        std::cout << "Ваш ToDo список справ:" << std::endl << std::endl;
+        int i = 1;
+        for (auto it = ls.begin(); it != ls.end(); ++it) {
+            std::cout << "-------------------------------" << std::endl;
+            std::cout << i << " " << it->description << std::endl;
+            ++i;
+        }
+        std::cout << "-------------------------------" << std::endl;
+        std::cout << std::endl << "Щоб додати нову справу, напишіть \"new\"" << std::endl;
+        std::cout << "Щоб видалити справу, напишіть \"rm\"" << std::endl;
+        std::cout << "Щоб вийти, напишіть \"exit\"" << std::endl;
+        
+        char command[100];
+        std::cin >> command;
+        
+        if (strcmp_equal(command, "exit")) {
+            isExit = true;
+        } else if (strcmp_equal(command, "new")) {
+            std::cout << "Введіть опис нової справи: ";
+            std::cin.ignore();
+            char desc[256];
+            std::cin.getline(desc, 256);
+            ls.push_back(Task(desc));
+        } else if (strcmp_equal(command, "rm")) {
+            std::cout << "Введіть номер справи для видалення: ";
+            int num;
+            std::cin >> num;
+            auto it = ls.begin();
+            if (num > 0 && num <= ls.size()) {
+                for (int j = 1; j < num; ++j) ++it;
+                ls.erase(it);
+            } else {
+                std::cout << "Невірний номер!" << std::endl;
+            }
+        }
+        
+    } while (!isExit);
+    
     return 0;
 }
