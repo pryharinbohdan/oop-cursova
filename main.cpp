@@ -58,6 +58,8 @@ class Linked2List {
       public:
         iterator();
         iterator(t_node<T>* ptr); 
+        // Перевантаження оператору присвоювання (для значення)
+        iterator operator=(const T& val);
         iterator operator ++ ();
         iterator operator -- ();
         bool operator != (const iterator& guest);
@@ -73,6 +75,8 @@ class Linked2List {
       public:
         reverse_iterator();
         reverse_iterator(t_node<T>* ptr); 
+        // Перевантаження оператору присвоювання (для значення)
+        reverse_iterator operator=(const T& val);
         reverse_iterator operator ++ ();
         reverse_iterator operator -- ();
         bool operator != (const reverse_iterator& guest);
@@ -167,6 +171,12 @@ template <typename T>
 Linked2List<T>::iterator::iterator(t_node<T>* ptr) : ptr(ptr) {}
 
 template <typename T>
+typename Linked2List<T>::iterator Linked2List<T>::iterator::operator=(const T& val) {
+    ptr -> data = val;
+    return *this;
+}
+
+template <typename T>
 typename Linked2List<T>::iterator Linked2List<T>::iterator::operator ++ () {
     ptr = ptr -> next;
     return *this;
@@ -207,6 +217,12 @@ Linked2List<T>::reverse_iterator::reverse_iterator() : ptr(nullptr) {}
 
 template <typename T>
 Linked2List<T>::reverse_iterator::reverse_iterator(t_node<T>* ptr) : ptr(ptr) {}
+
+template <typename T>
+typename Linked2List<T>::reverse_iterator Linked2List<T>::reverse_iterator::operator=(const T& val) {
+    ptr -> data = val;
+    return *this;
+}
 
 template <typename T>
 typename Linked2List<T>::reverse_iterator Linked2List<T>::reverse_iterator::operator ++ () {
