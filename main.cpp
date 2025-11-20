@@ -3,9 +3,9 @@
 
 template <typename T>
 struct t_node {
-    T data;
-    t_node* prev;
-    t_node* next;
+    T data; // Поле даних типу Т
+    t_node* prev; // Вказівник на попередній вузол
+    t_node* next; // Вказівник на наступний вузол
     t_node(); // Конструктор за замовченням (створює sentinel)
     t_node(const T& data); // Конструктор з параметром
 };
@@ -13,8 +13,8 @@ struct t_node {
 template <typename T>
 class Linked2List {
   protected:
-    t_node<T>* sen;
-    size_t list_size;
+    t_node<T>* sen; // sentinel-вузол
+    size_t list_size; // розмір списку
   public:
     // Конструктор за замовченням
     Linked2List();
@@ -33,8 +33,8 @@ class Linked2List {
     /* Перевантаження оператора (==). Повертає true, якщо всі значення вузлів лівого списку
     дорівнюють відповідним значенням вузлів правого списку. */
     bool operator==(const Linked2List& other) const;
-    /* Перевантаження оператору (не дорівнює). Повертає true, в разі, якщо хоча б одне 
-    значення вузла лівого списку не дорівнює відповідному значенню вузла правого списку*/
+    /* Перевантаження оператору (недорівнює). Повертає true, в разі, якщо хоча б одне 
+    значення вузла лівого списку недорівнює відповідному значенню вузла правого списку*/
     bool operator!=(const Linked2List& other) const;
     /* Перевантаження оператору (більше). Повертає true, в разі, якщо 
     розмір лівого списку більше розміру правого, і false в іншому випадку */
@@ -49,45 +49,37 @@ class Linked2List {
     лівого списку менше або дорівнює розміру правого, і false в іншому випадку */
     bool operator<=(const Linked2List& other)const;
 
-    ///////////////////
-
     // Клас ітератор
-
     class iterator {
-        t_node<T>* ptr;
+        t_node<T>* ptr; // Поле для зберігання вказівника на поточний вузол
       public:
-        iterator();
-        iterator(t_node<T>* ptr); 
-        // Перевантаження оператору присвоювання (для значення)
-        iterator operator=(const T& val);
-        iterator operator ++ ();
-        iterator operator -- ();
-        bool operator != (const iterator& guest);
-        bool operator == (const iterator& guest);
-        T& operator * ();
-        T* operator->();
-        friend class Linked2List<T>;
+        iterator(); // Конструктор за замовчуванням
+        iterator(t_node<T>* ptr); // Конструктор з параметром
+        iterator operator=(const T& val); // Перевантаження оператору присвоювання (для значення)
+        iterator operator ++ (); // Перевантаженя оператору інкремента
+        iterator operator -- (); // Перевантаженя оператору декремента
+        bool operator != (const iterator& guest); // Перевантаженя оператору недорівнює
+        bool operator == (const iterator& guest); // Перевантаженя оператору дорівнює
+        T& operator * (); // Перевантаженя оператору розіменування
+        T* operator->(); // Перевантаженя оператору стрілки
+        friend class Linked2List<T>; // Робимо клас двозв'язного списку дружнім
     };
 
     // Клас реверсний ітератор
     class reverse_iterator {
-        t_node<T>* ptr;
+        t_node<T>* ptr; // Поле для зберігання вказівника на поточний вузол
       public:
-        reverse_iterator();
-        reverse_iterator(t_node<T>* ptr); 
-        // Перевантаження оператору присвоювання (для значення)
-        reverse_iterator operator=(const T& val);
-        reverse_iterator operator ++ ();
-        reverse_iterator operator -- ();
-        bool operator != (const reverse_iterator& guest);
-        bool operator == (const reverse_iterator& guest);
-        T& operator * ();
-        T* operator -> ();
-
-        friend class Linked2List<T>;
+        reverse_iterator(); // Конструктор за замовчуванням
+        reverse_iterator(t_node<T>* ptr); // Конструктор з параметром
+        reverse_iterator operator=(const T& val); // Перевантаження оператору присвоювання (для значення)
+        reverse_iterator operator ++ (); // Перевантаженя оператору інкремента
+        reverse_iterator operator -- (); // Перевантаженя оператору декремента
+        bool operator != (const reverse_iterator& guest); // Перевантаженя оператору недорівнює
+        bool operator == (const reverse_iterator& guest); // Перевантаженя оператору дорівнює
+        T& operator * (); // Перевантаженя оператору розіменування
+        T* operator -> (); // Перевантаженя оператору стрілки
+        friend class Linked2List<T>; // Робимо клас двозв'язного списку дружнім
     };
-
-    ////////////////////////////
 
     // Метод для вставлення вузла перед іншим вузлом у списку
     void insert_before(iterator it, const T& data);
@@ -127,27 +119,17 @@ class Linked2List {
 
     // Метод Swap (для обміну вмістом)
     void swap(Linked2List& other) noexcept;
-
     // Метод, що видаляє вузли за значенням
     void remove(const T& value); 
-
     // Метод, що видаляє вузли, які підходять за умовою унарного предикату
     void remove(bool (*unary_predicate)(T&)); 
-
     // Метод, що виконує злиття двох відсортованих списків
     void merge(Linked2List& other);
-
     // Метод (сортування злиттям) з компаратором
     void sort(bool (*compare)(T&, T&));
-
     // Метод, що робить класичний список циклічним (аргумент true), або навпаки, робить циклічний список - класичним (аргумент false)
-    void circular(const bool makeCirc); // РОБИТЬ СПИСОК ЦІИКЛІЧНИМ (ВІД'ЄДНУЄ SENTINEL)
+    void circular(const bool makeCirc); 
 };
-
-
-
-
-
 
 
 /////////////////// РЕАЛІЗАЦІЯ МЕТОДІВ /////////////////////////
@@ -279,7 +261,7 @@ Linked2List<T>::Linked2List(Linked2List&& other) noexcept : sen(other.sen), list
 
 /* *** ПЕРВАНТАЖЕННЯ ОПЕРАТОРІВ ****/
 
-// Оператор копіювання
+// Оператор копіювання, повертає посилання на поточний об'єкт
 template <typename T>
 Linked2List<T>& Linked2List<T>::operator=(const Linked2List<T>& other) {
     sen = new t_node<T>;
@@ -287,7 +269,7 @@ Linked2List<T>& Linked2List<T>::operator=(const Linked2List<T>& other) {
         push_back(*it);
     return *this;
 }
-// Оператор переміщення
+// Оператор переміщення, повертає посилання на поточний об'єкт
 template <typename T>
 Linked2List<T>& Linked2List<T>::operator=(const Linked2List<T>&& other) noexcept {
     sen = other.sen;
@@ -296,8 +278,9 @@ Linked2List<T>& Linked2List<T>::operator=(const Linked2List<T>&& other) noexcept
     other.list_size = 0;
     return *this;
 }
-
-// Перевантаження оператору (дорівнює)
+/*Перевантаження оператору (дорівнює), повертає true, 
+якщо розмірність списків однакова та дані в кожному відповідному 
+вузлі списків співпадають, в протилежному випадку, повертає false*/
 template <typename T>
 bool Linked2List<T>::operator==(const Linked2List<T>& other) const {
     if (list_size != other.list_size) return false;
@@ -308,38 +291,39 @@ bool Linked2List<T>::operator==(const Linked2List<T>& other) const {
     }
     return true;
 }
-
-
-// Перевантаження оператору (не дорівнює)
+/*Перевантаження оператору (недорівнює), повертає true, 
+якщо розмірність списків різна та/або якщо дані хоч в одному відповідному 
+вузлі другого списку не співпадають, в протилежному випадку, повертає false*/
 template <typename T>
 bool Linked2List<T>::operator!=(const Linked2List& other) const{
     return !(*this == other);
 }
-
-//Перевантаження оператору (більше)
+/*Перевантаження оператору (більше), повертає true, 
+якщо розмірність поточного списку більша за розмірність
+переданого, в протилежному випадку, повертає false*/
 template <typename T>
 bool Linked2List<T>::operator>(const Linked2List& other) const {
     return list_size > other.list_size;
 }
-
-//Перевантаження оператору (менше)
+/*Перевантаження оператору (менше), повертає true, 
+якщо розмірність поточного списку менша за розмірність
+переданого, в протилежному випадку, повертає false*/
 template <typename T>
 bool Linked2List<T>::operator<(const Linked2List& other) const {
     return list_size < other.list_size;
 }
-
-//Перевантаження оператору (більше або дорівнює)
+/* Перевантаження оператору (більше або дорівнює),
+логічне об'єднання операторів > та == */
 template <typename T>
 bool Linked2List<T>::operator>=(const Linked2List& other) const {
     return (this > other) || (this == other);
 }
-
-//Перевантаження оператору (менше або дорівнює)
+/* Перевантаження оператору (менше або дорівнює),
+логічне об'єднання операторів < та == */
 template <typename T>
 bool Linked2List<T>::operator<=(const Linked2List& other) const{
     return (this < other) || (this == other);
 }
-
 
 /* *** МЕТОДИ СПИСКУ (Linked2List<T>) *** */
 
@@ -363,7 +347,6 @@ void Linked2List<T>::insert_after(typename Linked2List<T>::iterator it, const T&
     it.ptr -> next = new_node;
     ++list_size;
 }
-
 // Метод, що видаляє обраний вузол списку
 template <typename T>
 typename Linked2List<T>::iterator Linked2List<T>::erase(typename Linked2List<T>::iterator it) {
@@ -433,13 +416,12 @@ template <typename T>
 typename Linked2List<T>::reverse_iterator Linked2List<T>::rend() const{
     return reverse_iterator(sen);
 }
-// Метод, що повертає кількість вузлів у списку
+// Метод, що повертає кількість вузлів у списку (тип size_t)
 template <typename T>
 size_t Linked2List<T>::size() const{
     return list_size;
 }
-
-// Метод, що шукає вузол за значенням у списку
+// Метод, що шукає вузол за значенням у списку, повертає ітератор на перший відповідний вузол
 template <typename T>
 typename Linked2List<T>::iterator Linked2List<T>::find(const T& value) const{
     for (auto it = begin(); it != end(); ++it) 
@@ -447,23 +429,19 @@ typename Linked2List<T>::iterator Linked2List<T>::find(const T& value) const{
             return it;
     return end();
 }
-
-// Метод, що шукає вузол за допомогою унарного предикату
+// Метод, що шукає вузол за допомогою унарного предикату, повертає ітератор на перший відповідний вузол
 template <typename T>
 typename Linked2List<T>::iterator Linked2List<T>::find(bool (*unary_predicate)(T&)) const {
     for (auto it = begin(); it != end(); ++it)
         if (unary_predicate(*it)) return it;
     return end();
 }
-
-
-// Метод Swap (для обміну вмістом)
+// Метод Swap (для обміну вмістом двох списків)
 template <typename T>
 void Linked2List<T>::swap(Linked2List& other) noexcept {
     std::swap(sen, other.sen);
     std::swap(list_size, other.list_size);
 }
-
 // Метод, що видаляє вузли за значенням
 template <typename T>
 void Linked2List<T>::remove(const T& value) {
@@ -486,7 +464,6 @@ void Linked2List<T>::remove(bool (*unary_predicate)(T&)) {
             ++it;
     }
 }
-
 // Метод, що зливає відсортований поточний список і відсортований переданий список в поточний список
 template <typename T>
 void Linked2List<T>::merge(Linked2List& other) {
@@ -501,26 +478,20 @@ void Linked2List<T>::merge(Linked2List& other) {
             ++it;
         }
     }
-    
     other.clear();  
-   
 }
-
 // Метод (сортування вставкою) за неспаданням з компаратором
 template <typename T>
 void Linked2List<T>::sort(bool (*compare)(T&, T&)) {
     if (size() <= 1) return;
     auto it = begin();
     ++it;
-    
     while (it != end()) {
         T key = *it;
         auto pos = begin();
-        
         while (pos != it && compare(*pos, key)) {
             ++pos;
         }
-        
         if (pos != it) {
             auto temp = it;
             ++it;
@@ -531,7 +502,6 @@ void Linked2List<T>::sort(bool (*compare)(T&, T&)) {
         }
     }
 }
-
 /* Метод, що робить зв'язний список циклічним, приймає як аргумент bool значення:
     true, якщо треба зробити із класичного списку зациклений список
     false, якщо з циклічного треба перетворити у класичний */
@@ -559,12 +529,6 @@ Linked2List<T>::~Linked2List() {
 }
 
 
-
-
-
-
-
-
 /////////////////////////// ДОПОМІЖНІ ФУНКЦІЇ ///////////////////////////////
 
 /* Функція перевірки двох рядків (const char* a, const char* b) 
@@ -577,7 +541,6 @@ bool strcmp_equal(const char* a, const char* b) {
     }
     return a[i] == b[i];
 }
-
 // Процедура копіювання рядка (const char* src) у масив (char* dest)
 void strcpy_custom(char* dest, const char* src) {
     size_t i = 0;
@@ -587,7 +550,6 @@ void strcpy_custom(char* dest, const char* src) {
     }
     dest[i] = '\0';
 }
-
 /* Функція для визначення довжини рядка (const char* str)
 Повертає довжину типу size_t */
 size_t strlen_custom(const char* str) {
