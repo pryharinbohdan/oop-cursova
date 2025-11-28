@@ -1,6 +1,6 @@
 #include <iostream>
 #include <utility>
-#include "Linked2List/Linked2List.hpp"
+#include "Linked2List/Linked2List.hpp" // підключаємо наш заголовковий файл
 
 /////////////////////////// ДОПОМІЖНІ ФУНКЦІЇ ///////////////////////////////
 
