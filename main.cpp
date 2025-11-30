@@ -178,11 +178,6 @@ void print_song(const Song& s, int num) {
 int main() {
     Linked2List<Song> playlist1;
     Linked2List<Song> playlist2;
-    // Додамо тестові пісні
-    playlist1.push_back(Song("Bohemian Rhapsody", "Queen", 354));
-    playlist1.push_back(Song("Imagine", "John Lennon", 183));
-    playlist1.push_back(Song("Stairway to Heaven", "Led Zeppelin", 482));
-    
     int choice; // Змінна, де зберігається вибір наступної дії користувача
     bool running = true; // Змінна, що використовується в якості прапорця, 
     //в разі значення false, програма завершить свою роботу
